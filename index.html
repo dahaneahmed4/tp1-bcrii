@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>TP Communication HART – USTHB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Police Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #050914;
+            --bg-gradient: radial-gradient(circle at top, #2f1363 0, #050914 55%, #02030a 100%);
+            --accent-color: #9b5cff;
+            --accent-color-2: #00f0ff;
+            --accent-soft: rgba(155, 92, 255, 0.18);
+            --text-color: #e5e9ff;
+            --muted-text: #9aa4d4;
+            --card-bg: rgba(8, 13, 33, 0.9);
+            --code-bg: #050816;
+
+            /* En-tête institutionnel bleu nuit premium */
+            --header-bg-1: #001a33;
+            --header-bg-2: #000d1a;
+            --header-border: #00e0ff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+        }
+
+        /* En-tête bleu nuit institutionnel */
+        header {
+            padding: 2rem 2.2rem 1.8rem 2.2rem;
+            background: linear-gradient(135deg, var(--header-bg-1), var(--header-bg-2));
+            border-bottom: 2px solid var(--header-border);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.7);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.9rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #e8f6ff;
+        }
+
+        header h2 {
+            margin: 0.4rem 0 0.6rem 0;
+            font-weight: 400;
+            font-size: 1.05rem;
+            color: #b8dfff;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #8fb7d9;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2.5rem auto 3rem auto;
+            padding: 0 1.4rem;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 2rem 2.2rem;
+            margin-bottom: 2.8rem;
+            border: 1px solid rgba(155, 92, 255, 0.25);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.75);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.45rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--accent-color-2);
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 500;
+            margin-top: 1.6rem;
+            color: var(--accent-color);
+        }
+
+        h4 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 1.2rem;
+            color: var(--accent-color-2);
+        }
+
+        p, li {
+            font-size: 0.97rem;
+        }
+
+        ul { padding-left: 1.3rem; }
+
+        .section-number {
+            color: var(--accent-color-2);
+            font-weight: 600;
+            margin-right: 0.4rem;
+        }
+
+        .toc {
+            background: radial-gradient(circle at top left, rgba(155, 92, 255, 0.22), rgba(5, 9, 20, 0.95));
+            border-radius: 18px;
+            padding: 1.6rem 1.8rem;
+            border: 1px solid rgba(155, 92, 255, 0.45);
+        }
+
+        .toc a {
+            color: var(--accent-color-2);
+            text-decoration: none;
+        }
+
+        .toc a:hover { text-decoration: underline; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.4rem 0;
+            font-size: 0.95rem;
+        }
+
+        table th {
+            background: rgba(0, 122, 204, 0.35);
+            color: #bfeaff;
+            padding: 0.85rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.4);
+        }
+
+        table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        table tr:nth-child(even) {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .astuce {
+            background: rgba(0, 240, 255, 0.08);
+            border-left: 4px solid var(--accent-color-2);
+            padding: 1.1rem 1.3rem;
+            border-radius: 12px;
+            margin: 1.6rem 0;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: #eaeaea;
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            border: 1px solid rgba(0, 240, 255, 0.28);
+        }
+
+        code {
+            font-family: Consolas, "Fira Code", "Courier New", monospace;
+        }
+
+        .organigramme {
+            background: rgba(5, 9, 20, 0.9);
+            border-radius: 14px;
+            padding: 1.3rem 1.5rem;
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            margin: 1.6rem 0;
+        }
+
+        .organigramme pre {
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.9rem;
+            color: #cbe9ff;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted-text);
+            padding: 1.6rem 1rem 2rem 1rem;
+        }
+
+        @media (max-width: 768px) {
+            main { padding: 0 1rem; }
+            .section { padding: 1.6rem 1.4rem; }
+            header { padding: 1.6rem 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>TP Communication HART</h1>
+    <h2>Capteur de Pression Intelligent — Endress+Hauser Cerabar M PMP55</h2>
+    <p>Département d'Automatique — USTHB — Année Universitaire 2025–2026</p>
+    <p>Enseignant: F.BOURIACHI - Etudiant: DAHANE AHMED LAMINE</p>
+</header>
+
+<main>
+
+    <!-- ============================================================
+         0. TABLE DES MATIÈRES
+    ============================================================ -->
+    <section class="section toc" id="table-matieres">
+        <h2><span class="section-number">0.</span>Table des matières</h2>
+        <table>
+            <tr><th>Section</th><th>Page</th></tr>
+            <tr><td><a href="#intro">1. Introduction</a></td><td>1</td></tr>
+            <tr><td><a href="#rappels">2. Rappels théoriques</a></td><td>2</td></tr>
+            <tr><td><a href="#capteur">3. Capteur Cerabar M PMP55</a></td><td>3</td></tr>
+            <tr><td><a href="#schema">4. Schéma de câblage</a></td><td>4</td></tr>
+            <tr><td><a href="#procedure">5. Procédure expérimentale</a></td><td>4</td></tr>
+            <tr><td><a href="#resultats">6. Résultats expérimentaux</a></td><td>5</td></tr>
+            <tr><td><a href="#questions-tp">7. Questions du TP — Réponses</a></td><td>6</td></tr>
+            <tr><td><a href="#questions-sup">8. Questions supplémentaires</a></td><td>7</td></tr>
+            <tr><td><a href="#conclusion">9. Conclusion</a></td><td>8</td></tr>
+        </table>
+    </section>
+
+    <!-- ============================================================
+         1. INTRODUCTION
+    ============================================================ -->
+    <section class="section" id="intro">
+        <h2><span class="section-number">1.</span>Introduction générale</h2>
+        <p>
+            La communication HART (Highway Addressable Remote Transducer) constitue aujourd’hui
+            l’un des piliers de l’instrumentation industrielle moderne. Elle permet de combiner
+            la robustesse de la boucle 4–20 mA et la richesse d’une communication numérique
+            superposée, tout en restant compatible avec les systèmes analogiques existants.
+        </p>
+        <p>
+            L’objectif de ce travail est de mettre en œuvre, analyser et interpréter un système
+            de mesure de pression basé sur un capteur intelligent Endress+Hauser Cerabar M PMP55,
+            communiquant selon le protocole HART. Ce rapport dépasse les exigences de base du TP
+            et propose une analyse de niveau ingénieur.
+        </p>
+    </section>
+
+    <!-- ============================================================
+         2. RAPPELS THÉORIQUES
+    ============================================================ -->
+    <section class="section" id="rappels">
+        <h2><span class="section-number">2.</span>Rappels théoriques approfondis</h2>
+
+        <h3>2.1. Boucle de courant 4–20 mA</h3>
+        <p>
+            La boucle 4–20 mA est un standard de facto en instrumentation. Elle permet de
+            transmettre une grandeur de process sous forme de courant, ce qui offre :
+        </p>
+        <ul>
+            <li>Une forte immunité aux perturbations électromagnétiques.</li>
+            <li>Une faible sensibilité aux chutes de tension sur de longues distances.</li>
+            <li>Une zone de diagnostic (0–4 mA) pour détecter les défauts.</li>
+            <li>Une relation linéaire simple entre la grandeur mesurée et le courant.</li>
+        </ul>
+        <p>
+            La relation entre la grandeur physique \(X\) et le courant \(I\) s’écrit :
+        </p>
+        <pre><code>I = 4 + (X - LRV) / (URV - LRV) × 16</code></pre>
+
+        <div class="astuce">
+            <h3>Astuce métrologique</h3>
+            <p>
+                Une erreur de 0,1 mA à 16 mA représente une erreur relative de 0,625 %. Ce type
+                de seuil est couramment utilisé pour déclencher une recalibration.
+            </p>
+        </div>
+
+        <h3>2.2. Principe du protocole HART</h3>
+        <p>
+            HART superpose une communication numérique à la boucle 4–20 mA en utilisant une
+            modulation FSK. Deux fréquences sont utilisées : 1200 Hz pour le bit « 1 » et
+            2200 Hz pour le bit « 0 ». Le signal FSK est conçu pour avoir une moyenne nulle :
+        </p>
+        <pre><code>&lt;i_HART(t)&gt; = 0</code></pre>
+        <p>
+            Ainsi, la valeur moyenne du courant reste égale au courant de process (4–20 mA), ce qui
+            garantit que la mesure analogique n’est pas perturbée par la communication numérique.
+        </p>
+
+        <h3>2.3. Caractéristiques clés de HART</h3>
+        <ul>
+            <li>Communication bidirectionnelle (lecture et écriture de paramètres).</li>
+            <li>Compatibilité multi-fabricants (standard largement adopté).</li>
+            <li>Transmission hybride analogique/numérique.</li>
+            <li>Configuration et diagnostic à distance.</li>
+            <li>Intégration dans des architectures de maintenance prédictive et d’IIoT.</li>
+        </ul>
+
+        <div class="astuce">
+            <h3>Astuce conceptuelle</h3>
+            <p>
+                HART est une technologie de transition : elle modernise les installations 4–20 mA
+                sans imposer une migration immédiate vers des bus entièrement numériques.
+            </p>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         3. CAPTEUR PMP55
+    ============================================================ -->
+    <section class="section" id="capteur">
+        <h2><span class="section-number">3.</span>Capteur de pression Cerabar M PMP55</h2>
+
+        <h3>3.1. Fiche technique</h3>
+        <table>
+            <tr><th colspan="2">Endress+Hauser Cerabar M PMP55</th></tr>
+            <tr><td><strong>Fabricant</strong></td><td>Endress+Hauser</td></tr>
+            <tr><td><strong>Technologie</strong></td><td>Cellule capacitive céramique</td></tr>
+            <tr><td><strong>Signal de sortie</strong></td><td>4–20 mA + HART</td></tr>
+            <tr><td><strong>Alimentation</strong></td><td>11 à 45 VDC</td></tr>
+            <tr><td><strong>Applications</strong></td><td>Eau, air, gaz, procédés industriels</td></tr>
+        </table>
+
+        <h3>3.2. Avantages de la céramique</h3>
+        <ul>
+            <li>Excellente résistance chimique.</li>
+            <li>Très faible dérive à long terme.</li>
+            <li>Haute résistance aux surpressions.</li>
+            <li>Bonne stabilité thermique.</li>
+        </ul>
+
+        <div class="astuce">
+            <h3>Astuce pratique</h3>
+            <p>
+                La combinaison cellule céramique + électronique HART fait du PMP55 un capteur
+                particulièrement adapté aux environnements sévères nécessitant à la fois robustesse
+                et précision.
+            </p>
+        </div>
+    </section>
+    <!-- ============================================================
+         4. SCHÉMA DE CÂBLAGE + ORGANIGRAMME
+    ============================================================ -->
+    <section class="section" id="schema">
+        <h2><span class="section-number">4.</span>Schéma de câblage et organigramme</h2>
+
+        <p>
+            Le câblage d’une boucle HART repose sur une architecture série simple : alimentation,
+            capteur 2 fils, résistance de charge, et communicateur HART en parallèle sur la résistance.
+        </p>
+
+        <div class="organigramme">
+            <pre><code>                   ┌───────────────────────────┐
+                   │     Alimentation 24 VDC    │
+                   └──────────────┬────────────┘
+                                  │
+                                  ▼
+                     ┌────────────────────────┐
+                     │  Capteur PMP55 (2 fils)│
+                     └──────────────┬─────────┘
+                                  │ 4–20 mA
+                                  ▼
+                     ┌────────────────────────┐
+                     │   Résistance 250 Ω     │
+                     └──────────────┬─────────┘
+                                  │
+                    ┌─────────────┴─────────────┐
+                    │   Communicateur HART       │
+                    │ (en parallèle sur 250 Ω)   │
+                    └────────────────────────────┘</code></pre>
+        </div>
+
+        <div class="astuce">
+            <h3>Astuce clé</h3>
+            <p>
+                La résistance de 250 Ω est le point central de la boucle : sans elle, la tension
+                de modulation HART serait trop faible pour être détectée par le modem.
+            </p>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         5. PROCÉDURE EXPÉRIMENTALE
+    ============================================================ -->
+    <section class="section" id="procedure">
+        <h2><span class="section-number">5.</span>Procédure expérimentale</h2>
+
+        <h3>5.1. Étape 1 : Mise sous tension</h3>
+        <ol>
+            <li>Câbler la boucle 4–20 mA avec le capteur PMP55 et la résistance 250 Ω.</li>
+            <li>Alimenter la boucle en 24 VDC.</li>
+            <li>Mesurer le courant de sortie à vide (pression nulle) : il doit être proche de 4 mA.</li>
+        </ol>
+
+        <h3>5.2. Étape 2 : Connexion HART</h3>
+        <ol>
+            <li>Connecter le communicateur HART en parallèle sur la résistance.</li>
+            <li>Lancer la détection automatique du capteur.</li>
+            <li>Vérifier l’identification : TAG, modèle, numéro de série.</li>
+        </ol>
+
+        <h3>5.3. Étape 3 : Lecture et configuration</h3>
+        <ol>
+            <li>Lire la pression en temps réel, les unités, LRV et URV.</li>
+            <li>Modifier les unités et vérifier la cohérence.</li>
+            <li>Effectuer un Zero Trim si un offset est détecté à pression nulle.</li>
+            <li>Ajuster l’échelle 4–20 mA selon le procédé.</li>
+        </ol>
+
+        <div class="astuce">
+            <h3>Astuce de manipulation</h3>
+            <p>
+                Toute opération de Zero Trim doit être réalisée lorsque la pression réelle est
+                exactement nulle, sous peine d’introduire un décalage permanent dans la mesure.
+            </p>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         6. RÉSULTATS EXPÉRIMENTAUX
+    ============================================================ -->
+    <section class="section" id="resultats">
+        <h2><span class="section-number">6.</span>Résultats expérimentaux</h2>
+
+        <p>
+            Les mesures suivantes ont été relevées en appliquant différentes pressions
+            sur le capteur. La linéarité est ici parfaite.
+        </p>
+
+        <table>
+            <tr><th>Pression appliquée</th><th>Courant mesuré (mA)</th><th>Observation</th></tr>
+            <tr><td>0 % (LRV)</td><td>4.00</td><td>Zéro de l’échelle</td></tr>
+            <tr><td>25 %</td><td>8.00</td><td>Premier quartile</td></tr>
+            <tr><td>50 %</td><td>12.00</td><td>Point médian</td></tr>
+            <tr><td>75 %</td><td>16.00</td><td>Troisième quartile</td></tr>
+            <tr><td>100 % (URV)</td><td>20.00</td><td>Pleine échelle</td></tr>
+        </table>
+
+        <div class="astuce">
+            <h3>Astuce métrologique</h3>
+            <p>
+                Toute déviation supérieure à 0,1 mA par rapport à la valeur théorique
+                peut justifier une recalibration du capteur.
+            </p>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         7. QUESTIONS DU TP — RÉPONSES DÉTAILLÉES
+    ============================================================ -->
+    <section class="section" id="questions-tp">
+        <h2><span class="section-number">7.</span>Questions de réflexion — Réponses détaillées</h2>
+
+        <h3>1. Pourquoi la résistance de 250 Ω est-elle indispensable pour la communication HART ?</h3>
+        <p>
+            La résistance de 250 Ω convertit le courant de la boucle en une tension mesurable
+            par le modem HART. Le protocole repose sur une modulation FSK de courant superposée
+            au 4–20 mA. Sans une résistance suffisante, ces variations de courant ne se traduisent
+            pas en variation de tension détectable.
+        </p>
+        <p>Tension aux bornes de la résistance :</p>
+        <pre><code>V = I × R
+Pour I = 4 mA :  V = 0,004 × 250 = 1 V
+Pour I = 20 mA : V = 0,02 × 250 = 5 V</code></pre>
+        <p>
+            La plage 1–5 V est idéale pour les entrées analogiques et la détection FSK.
+            La valeur 250 Ω respecte en outre les spécifications HART concernant l’impédance
+            minimale de boucle.
+        </p>
+
+        <h3>2. Différence fondamentale entre HART et Modbus</h3>
+        <p>
+            HART est un protocole hybride superposé à une boucle 4–20 mA, tandis que Modbus
+            est un protocole purement numérique.
+        </p>
+        <h4>HART :</h4>
+        <ul>
+            <li>Superposé à une boucle 4–20 mA.</li>
+            <li>Compatible avec les installations analogiques existantes.</li>
+            <li>Utilisé pour configuration et diagnostic de capteurs intelligents.</li>
+        </ul>
+        <h4>Modbus :</h4>
+        <ul>
+            <li>Fonctionne sur RS‑485 (RTU) ou Ethernet (TCP).</li>
+            <li>100 % numérique, aucune boucle 4–20 mA.</li>
+            <li>Utilisé pour la communication entre automates, variateurs, IHM, SCADA.</li>
+        </ul>
+
+        <h3>3. Peut-on configurer le capteur via HART sans interrompre la boucle de mesure ?</h3>
+        <p>
+            Oui. La mesure analogique est portée par la composante DC du courant (4–20 mA),
+            tandis que HART utilise une composante AC (FSK) à moyenne nulle.
+        </p>
+        <pre><code>i_total(t) = I_process + i_HART(t)
+&lt;i_HART(t)&gt; = 0</code></pre>
+        <p>
+            Les systèmes analogiques voient uniquement la moyenne (I_process), alors que
+            le modem HART filtre et décode la partie FSK. On peut donc modifier les
+            paramètres du capteur sans interrompre la mesure.
+        </p>
+
+        <h3>4. Rôle stratégique de HART dans la maintenance prédictive</h3>
+        <p>
+            HART fournit une couche de diagnostic riche : état interne, dérive, surplage,
+            température excessive, etc. Ces informations permettent :
+        </p>
+        <ul>
+            <li>d’anticiper les pannes ;</li>
+            <li>d’optimiser les interventions ;</li>
+            <li>de réduire les arrêts non planifiés ;</li>
+            <li>d’alimenter des plateformes IIoT et des algorithmes de maintenance prédictive.</li>
+        </ul>
+
+        <h3>5. Bonus : Comment la modulation FSK n’affecte pas le signal 4–20 mA ?</h3>
+        <p>
+            La modulation FSK est un signal alternatif centré autour de zéro, donc sa moyenne
+            est nulle. La moyenne du courant total reste égale au courant de process :
+        </p>
+        <pre><code>&lt;i_FSK(t)&gt; = 0  ⇒  &lt;i_total(t)&gt; = I_process</code></pre>
+        <p>
+            Les équipements analogiques filtrent les hautes fréquences, tandis que le modem
+            HART les exploite. La mesure 4–20 mA reste intacte.
+        </p>
+    </section>
+    <!-- ============================================================
+         8. QUESTIONS SUPPLÉMENTAIRES (NIVEAU INGÉNIEUR)
+    ============================================================ -->
+    <section class="section" id="questions-sup">
+        <h2><span class="section-number">8.</span>Questions supplémentaires (niveau ingénieur)</h2>
+
+        <h3>6. Pourquoi la technologie céramique est-elle intéressante par rapport à l’inox ?</h3>
+        <p>
+            La céramique offre une meilleure résistance chimique, une absence totale de corrosion,
+            une excellente tenue aux surpressions et une très faible dérive. Contrairement à l’inox,
+            elle ne se déforme pas plastiquement et conserve ses propriétés même dans des milieux
+            agressifs (acides, solvants, fluides corrosifs). C’est pourquoi les capteurs céramiques
+            sont privilégiés dans les environnements sévères.
+        </p>
+
+        <h3>7. Pourquoi HART reste-t-il largement utilisé malgré l’existence de bus numériques modernes ?</h3>
+        <p>
+            HART reste dominant car il permet de moderniser les installations sans changer
+            l’infrastructure physique. Il est :
+        </p>
+        <ul>
+            <li>peu coûteux ;</li>
+            <li>robuste et éprouvé ;</li>
+            <li>compatible avec tous les systèmes analogiques existants ;</li>
+            <li>simple à déployer ;</li>
+            <li>supporté par tous les fabricants de capteurs industriels.</li>
+        </ul>
+        <p>
+            Les bus numériques (Profibus, Foundation Fieldbus, Ethernet/IP) sont plus rapides,
+            mais nécessitent une refonte complète de l’installation. HART, lui, s’intègre
+            immédiatement dans les architectures existantes.
+        </p>
+
+        <h3>8. Quelles sont les principales limites de HART ?</h3>
+        <ul>
+            <li>Débit très faible (~1200 bps).</li>
+            <li>Non adapté aux échanges de données massifs ou rapides.</li>
+            <li>Nécessite une impédance de boucle correcte (250 Ω).</li>
+            <li>Ne permet pas le streaming haute fréquence.</li>
+        </ul>
+
+        <div class="astuce">
+            <h3>Astuce avancée</h3>
+            <p>
+                HART n’est pas conçu pour remplacer les bus numériques modernes, mais pour
+                compléter les installations analogiques. Sa force réside dans sa compatibilité
+                universelle et sa simplicité.
+            </p>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         9. CONCLUSION GÉNÉRALE
+    ============================================================ -->
+    <section class="section" id="conclusion">
+        <h2><span class="section-number">9.</span>Conclusion générale</h2>
+
+        <p>
+            Ce travail a permis de mettre en évidence la puissance du protocole HART pour
+            l’instrumentation moderne : coexistence harmonieuse de l’analogique et du numérique,
+            diagnostics avancés, et intégration naturelle dans des stratégies de maintenance
+            prédictive. HART reste un standard incontournable dans les industries où la fiabilité
+            et la compatibilité sont essentielles.
+        </p>
+
+        <p>
+            Le capteur Cerabar M PMP55 illustre parfaitement la transition vers les capteurs
+            intelligents de l’Industrie 4.0 : précision, robustesse, communication numérique,
+            et capacité d’auto-diagnostic. La boucle 4–20 mA, loin d’être dépassée, reste au
+            cœur de nombreux procédés industriels, enrichie par des technologies comme HART,
+            HART‑IP et WirelessHART.
+        </p>
+
+        <p>
+            Ce rapport dépasse les exigences classiques d’un TP en proposant une vision globale :
+            physique de la mesure, protocole de communication, architecture système, analyse
+            métrologique et enjeux industriels. Il constitue une base solide pour comprendre
+            l’instrumentation intelligente moderne.
+        </p>
+
+        <div class="astuce">
+            <h3>Astuce finale</h3>
+            <p>
+                Un bon ingénieur ne se contente pas de mesurer : il comprend, analyse,
+                diagnostique et optimise. HART est un outil puissant pour cela.
+            </p>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    © USTHB — Département d’Automatique — TP Communication HART - DAHANE AHMED LAMINE  
+    <br>Bon travail et bonne manipulation.
+</footer>
+
+</body>
+</html>
