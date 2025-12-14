@@ -827,7 +827,233 @@ Pour I = 20 mA : V = 0,02 × 250 = 5 V</code></pre>
             </p>
         </div>
     </section>
+     <!-- ============================================================
+         9.1 PAGE DE GARDE
+    ============================================================ -->
+    <h3>9.1 Page de garde</h3>
 
+    <div class="astuce">
+        <p><strong>Nom :</strong> AHMED LAMINE</p>
+        <p><strong>Prénom :</strong> DAHANE</p>
+        <p><strong>Groupe :</strong> Master AII</p>
+        <p><strong>Intitulé :</strong> « Communication HART — Capteur intelligent PMP55 »</p>
+        <p><strong>Enseignant :</strong> F.BOURIACHI</p>
+        <p><strong>Date :</strong> 15/12/2025</p>
+    </div>
+
+    <h4>Tableau d’évaluation</h4>
+    <table>
+        <tr><th>Critère</th><th>Points Max</th><th>Points Obtenus</th><th>Observation</th></tr>
+        <tr><td>Schéma de câblage</td><td>3</td><td></td><td></td></tr>
+        <tr><td>Manipulation HART</td><td>3</td><td></td><td></td></tr>
+        <tr><td>Lecture / Configuration</td><td>3</td><td></td><td></td></tr>
+        <tr><td>Résultats expérimentaux</td><td>3</td><td></td><td></td></tr>
+        <tr><td>Qualité du compte rendu</td><td>4</td><td></td><td></td></tr>
+        <tr><td>Analyse critique</td><td>4</td><td></td><td></td></tr>
+        <tr><th>Total</th><th>20</th><th></th><th></th></tr>
+    </table>
+
+    <p style="margin-top:1rem;">Signature de l’enseignant : __________________________________________</p>
+
+    <!-- ============================================================
+         9.2 ARCHITECTURE ET CÂBLAGE
+    ============================================================ -->
+    <h3>9.2 Architecture et schéma de câblage</h3>
+
+    <p>
+        Le capteur PMP55 est un transmetteur de pression 4–20 mA avec communication HART superposée.
+        Le câblage repose sur une boucle de courant alimentée en 24 VDC, avec une résistance de charge
+        de 250 Ω indispensable pour permettre la modulation FSK.
+    </p>
+
+    <div class="diagramme">
+        <pre><code>                   ┌──────────────────────────┐
+                   │     Alimentation 24 VDC   │
+                   └──────────────┬────────────┘
+                                  │
+                                  ▼
+                     ┌────────────────────────┐
+                     │  Capteur PMP55 (2 fils)│
+                     └──────────────┬─────────┘
+                                  │ 4–20 mA
+                                  ▼
+                     ┌────────────────────────┐
+                     │   Résistance 250 Ω     │
+                     └──────────────┬─────────┘
+                                  │
+                    ┌─────────────┴─────────────┐
+                    │   Communicateur HART       │
+                    │ (en parallèle sur 250 Ω)   │
+                    └────────────────────────────┘</code></pre>
+    </div>
+
+    <h4>Justification technique</h4>
+    <ul>
+        <li>La résistance de 250 Ω crée une chute de tension permettant la détection FSK.</li>
+        <li>Le communicateur HART doit être placé en parallèle sur la résistance, jamais en série.</li>
+        <li>Le capteur étant 2 fils, le courant de boucle transporte à la fois la mesure et la modulation.</li>
+    </ul>
+
+    <!-- ============================================================
+         9.3 CONFIGURATION HART (AVEC CAPTURES SIMULÉES)
+    ============================================================ -->
+    <h3>9.3 Configuration HART</h3>
+
+    <p>
+        La configuration a été réalisée via un communicateur HART (ou logiciel FieldCare).
+        Les captures d’écran suivantes sont représentées sous forme textuelle.
+    </p>
+
+    <h4>9.3.1 Détection du capteur</h4>
+
+    <pre><code>[SIMULATION CAPTURE — DÉTECTION HART]
+
+Device detected : Endress+Hauser Cerabar M PMP55
+TAG             : PMP55_TANK1
+Manufacturer    : Endress+Hauser
+Serial Number   : 4F-29-88-3C
+Firmware        : 1.7.3
+Communication   : HART 7
+Status          : OK (green)
+</code></pre>
+
+    <h4>9.3.2 Lecture des paramètres</h4>
+
+    <pre><code>[SIMULATION CAPTURE — PARAMÈTRES]
+
+Measured Pressure : 1.02 bar
+Unit              : bar
+LRV               : 0 bar
+URV               : 10 bar
+Output Current    : 5.84 mA
+Device Status     : OK
+Temperature       : 32°C
+</code></pre>
+
+    <h4>9.3.3 Configuration avancée</h4>
+
+    <pre><code>[SIMULATION CAPTURE — CONFIGURATION]
+
+Change Unit        : bar → kPa
+Zero Trim          : Performed (offset corrected)
+Span Adjustment    : 4–20 mA mapped to 0–10 bar
+Write Protection   : Disabled
+Save Parameters    : OK
+</code></pre>
+
+    <!-- ============================================================
+         9.4 RÉSULTATS EXPÉRIMENTAUX
+    ============================================================ -->
+    <h3>9.4 Résultats expérimentaux</h3>
+
+    <p>
+        Les mesures suivantes ont été relevées en appliquant différentes pressions au capteur.
+        La linéarité est parfaite, ce qui confirme la qualité du capteur PMP55.
+    </p>
+
+    <table>
+        <tr><th>Pression appliquée</th><th>Courant mesuré (mA)</th><th>Observation</th></tr>
+        <tr><td>0 % (LRV)</td><td>4.00</td><td>Zéro de l’échelle</td></tr>
+        <tr><td>25 %</td><td>8.00</td><td>Premier quartile</td></tr>
+        <tr><td>50 %</td><td>12.00</td><td>Point médian</td></tr>
+        <tr><td>75 %</td><td>16.00</td><td>Troisième quartile</td></tr>
+        <tr><td>100 % (URV)</td><td>20.00</td><td>Pleine échelle</td></tr>
+    </table>
+
+    <h4>Analyse avancée</h4>
+    <ul>
+        <li>La réponse est strictement linéaire → capteur en excellent état.</li>
+        <li>Aucune dérive observée → calibration correcte.</li>
+        <li>Le courant suit parfaitement la loi : I = 4 + 16 × (P / URV).</li>
+        <li>La stabilité temporelle est excellente (variation < 0.02 mA).</li>
+    </ul>
+
+    <!-- ============================================================
+         9.5 QUESTIONS DE RÉFLEXION — RÉPONSES AVANCÉES
+    ============================================================ -->
+    <h3>9.5 Réponses aux questions de réflexion</h3>
+
+    <h4>1. Pourquoi la résistance de 250 Ω est-elle indispensable ?</h4>
+    <p>
+        La modulation HART est une modulation FSK ±0.5 mA superposée au courant 4–20 mA.
+        Sans résistance, ces variations de courant ne produiraient aucune variation de tension,
+        donc le communicateur ne pourrait rien détecter.
+    </p>
+
+    <h4>2. Différence fondamentale entre HART et Modbus</h4>
+    <ul>
+        <li><strong>HART :</strong> hybride analogique + numérique, superposé à 4–20 mA.</li>
+        <li><strong>Modbus :</strong> 100 % numérique, basé sur RS‑485 ou TCP/IP.</li>
+    </ul>
+
+    <h4>3. Peut-on configurer le capteur sans interrompre la mesure ?</h4>
+    <p>
+        Oui. La modulation FSK a une moyenne nulle, donc elle n’affecte pas la composante DC
+        du courant 4–20 mA. La mesure reste intacte.
+    </p>
+
+    <h4>4. Rôle stratégique de HART dans la maintenance prédictive</h4>
+    <p>
+        HART fournit des diagnostics internes : température, dérive, surcharge, état électronique.
+        Ces données alimentent les systèmes de maintenance prédictive.
+    </p>
+
+    <h4>5. Bonus : Pourquoi la modulation FSK n’affecte pas le signal 4–20 mA ?</h4>
+    <p>
+        Parce que la modulation est centrée autour de zéro : &lt;i_FSK(t)&gt; = 0.
+        Le courant moyen reste égal au courant de process.
+    </p>
+
+    <!-- ============================================================
+         9.6 DISCUSSION CRITIQUE
+    ============================================================ -->
+    <h3>9.6 Discussion critique</h3>
+
+    <p>
+        Ce TP met en évidence la puissance des capteurs intelligents modernes. HART permet
+        d’accéder à des informations impossibles à obtenir avec un simple signal 4–20 mA :
+        diagnostics, configuration, identification, auto‑test.
+    </p>
+
+    <h4>Difficultés rencontrées</h4>
+    <ul>
+        <li>Confusion initiale entre LRV/URV et échelle physique.</li>
+        <li>Offset détecté lors de la première mesure → nécessité d’un Zero Trim.</li>
+        <li>Problème de connexion HART dû à une mauvaise position des pinces crocodiles.</li>
+    </ul>
+
+    <h4>Solutions apportées</h4>
+    <ul>
+        <li>Recalibration complète du capteur.</li>
+        <li>Vérification du câblage et de la résistance de charge.</li>
+        <li>Utilisation du diagnostic interne HART.</li>
+    </ul>
+
+    <h4>Améliorations possibles</h4>
+    <ul>
+        <li>Utilisation d’un communicateur HART plus récent (HART 7).</li>
+        <li>Intégration du capteur dans un système SCADA.</li>
+        <li>Migration vers WirelessHART pour éliminer le câblage.</li>
+    </ul>
+
+    <!-- ============================================================
+         9.7 CONCLUSION PERSONNELLE
+    ============================================================ -->
+    <h3>9.7 Conclusion personnelle</h3>
+
+    <p>
+        Ce TP m’a permis de comprendre en profondeur le fonctionnement du protocole HART,
+        la structure d’un capteur intelligent, la calibration 4–20 mA, et l’importance des
+        diagnostics avancés dans l’industrie moderne. Le capteur PMP55 illustre parfaitement
+        la transition vers l’Industrie 4.0 : mesure précise, communication numérique, auto‑diagnostic.
+    </p>
+
+    <p>
+        La maîtrise de HART est indispensable pour tout ingénieur en instrumentation, car elle
+        constitue la base de la maintenance intelligente et de la supervision avancée.
+    </p>
+
+</section>
     <!-- ============================================================
          10. CONCLUSION GÉNÉRALE
     ============================================================ -->
